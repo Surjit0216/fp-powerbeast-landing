@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FP PowerBeast Indicator - 100% Non-Repaint Buy/Sell System for TradingView. Accurate entries, multi-target exits, and reliable stop-loss for serious traders.">
+    <title>FP PowerBeast Indicator - 100% Non-Repaint Trading System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --secondary: #0066ff;
+            --dark: #0a0e27;
+            --darker: #050814;
+            --accent: #ff00ff;
+            --success: #00ff88;
+            --danger: #ff3366;
+            --text: #ffffff;
+            --text-muted: #a0aec0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+            opacity: 0.15;
+            top: -250px;
+            right: -250px;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            opacity: 0.1;
+            bottom: -200px;
+            left: -200px;
+            animation: pulse 5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.15; }
+            50% { transform: scale(1.2); opacity: 0.25; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .badge-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .badge {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .subheadline {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .chart-placeholder {
+            margin-top: 3rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-placeholder p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text) 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Who This Is For */
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .audience-card {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .audience-card:hover {
+            transform: scale(1.05);
+            border-color: var(--success);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .audience-card h4 {
+            font-size: 1.3rem;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Chart Elements */
+        .chart-elements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .chart-element {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .chart-element-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-element h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        /* Timeframes */
+        .timeframes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .timeframe-chip {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 102, 255, 0.1) 100%);
+            border: 2px solid var(--primary);
+            padding: 1.5rem 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .timeframe-chip strong {
+            display: block;
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeframe-chip span {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(0, 102, 255, 0.05) 100%);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+        }
+
+        .pricing-card.featured::before {
+            content: 'BEST VALUE';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            padding: 0.5rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+        }
+
+        .pricing-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 1.5rem 0;
+            color: var(--text);
+        }
+
+        .price-period {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 0.75rem 0;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 5rem;
+            color: var(--primary);
+            opacity: 0.2;
+        }
+
+        .testimonial-text {
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .author-info h5 {
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .author-info p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .verified-badge {
+            color: var(--success);
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+
+        /* FAQ */
+        .faq-container {
+            max-width: 800px;
+            margin: 3rem auto 0;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .faq-question {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .faq-answer {
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* Contact */
+        .contact-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 3rem;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--darker);
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-brand {
+            color: var(--text-muted);
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-brand strong {
+            color: var(--primary);
+        }
+
+        /* Sticky CTA Mobile */
+        .sticky-cta {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 1rem;
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .sticky-cta .btn {
+            width: 100%;
+            background: var(--dark);
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .sticky-cta {
+                display: block;
+            }
+
+            section {
+                padding: 4rem 1.5rem;
+            }
+
+            .cta-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content fade-in-up">
+            <div class="badge-container">
+                <span class="badge">🚫 Non-Repaint</span>
+                <span class="badge">✅ Trader Verified</span>
+                <span class="badge">📈 Trend-Accurate</span>
+            </div>
+            
+            <h1>FP PowerBeast Indicator</h1>
+            <p class="subheadline">
+                100% Non-Repaint Buy/Sell System with accurate entries, multi-target exits, dynamic targets, and clean stop-loss — all without repainting.
+            </p>
+            
+            <div class="cta-container">
+                <a href="#pricing" class="btn btn-primary">Start 30-Day Free Trial</a>
+                <a href="#pricing" class="btn btn-secondary">View Pricing</a>
+            </div>
+
+            <div class="chart-placeholder">
+                <p>📊 [Insert TradingView Chart GIF Demo Here]</p>
+                <p style="font-size: 0.9rem; margin-top: 1rem;">Live chart showing real-time buy/sell signals with multi-target system</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" style="background: var(--dark);">
+        <div class="container">
+            <h2 class="section-title">Powerful Features Built for Serious Traders</h2>
+            <p class="section-subtitle">Everything you need for confident, profitable trading decisions</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>100% Non-Repaint Signals</h3>
+                    <p>Confirmed candle close logic ensures signals NEVER shift or repaint. What you see is what you get — always.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Crystal Clear Buy/Sell Entries</h3>
+                    <p>Precise entry points that never move. Enter trades with complete confidence and zero confusion.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎪</div>
+                    <h3>T1 → T6 Multi-Target System</h3>
+                    <p>Six clearly defined profit targets for controlled, systematic exits. Scale out positions professionally.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Dynamic T6+ Mode</h3>
+                    <p>Unlimited trend expansion with T7, T8, T9+ targets on strong trending moves. Maximize your winners.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Auto Stop-Loss Protection</h3>
+                    <p>Non-repainting stop-loss levels printed only when valid. Protect your capital automatically.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Universal Market Support</h3>
+                    <p>Works flawlessly across Index, Stocks, Options, and Crypto markets. One indicator, all markets.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💯</div>
+                    <h3>90% Historical Accuracy</h3>
+                    <p>Minimum 100 points (Target 4) achievable in BankNIFTY & Sensex with proven 90% accuracy.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <h3>Clean Visual Interface</h3>
+                    <p>Minimal, professional UI with clear labels for Entry, SL, and all Targets. No chart clutter.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Who This Is For -->
+    <section id="audience">
+        <div class="container">
+            <h2 class="section-title">Built For Traders Like You</h2>
+            <p class="section-subtitle">Whether you're scalping or swing trading, FP PowerBeast has you covered</p>
+            
+            <div class="audience-grid">
+                <div class="audience-card">
+                    <h4>📊 BankNIFTY Scalpers</h4>
+                    <p>Lightning-fast signals for quick intraday profits</p>
+                </div>
+
+                <div class="audience-card">
+                    <h4>📈 NIFTY Option Buyers</h4>
+                    <p>Perfect timing for option entries and exits</p>
+                </div>
+
+                <div class="audience-card">
+                    <h4>⚡ Intraday System Traders</h4>
+                    <p>Systematic approach to day trading success</p>
+                </div>
+
+                <div class="audience-card">
+                    <h4>🌊 Swing Traders</h4>
+                    <p>Capture multi-day trends in stocks and crypto</p>
+                </div>
+
+                <div class="audience-card">
+                    <h4>💼 Retail Traders</h4>
+                    <p>Stress-free trading with no confusion</p>
+                </div>
+
+                <div class="audience-card">
+                    <h4>🪙 Crypto Traders</h4>
+                    <p>Perfect for BTCUSDT and altcoin trading</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What You See On Chart -->
+    <section style="background: var(--dark);">
+        <div class="container">
+            <h2 class="section-title">What You See On Your Chart</h2>
+            <p class="section-subtitle">Clean, professional, and instantly actionable signals</p>
+            
+            <div class="chart-elements">
+                <div class="chart-element">
+                    <div class="chart-element-icon">🟢</div>
+                    <h4>Buy Labels</h4>
+                    <p>Appear exactly at trend shifts with perfect timing</p>
+                </div>
+
+                <div class="chart-element">
+                    <div class="chart-element-icon">🔴</div>
+                    <h4>Sell Labels</h4>
+                    <p>Trigger precisely where signals confirm</p>
+                </div>
+
+                <div class="chart-element">
+                    <div class="chart-element-icon">🎯</div>
+                    <h4>T1–T6 Targets</h4>
+                    <p>Instantly plotted profit targets for systematic exits</p>
+                </div>
+
+                <div class="chart-element">
+                    <div class="chart-element-icon">🚀</div>
+                    <h4>Dynamic Targets</h4>
+                    <p>T7, T8, T9+ on strong trending moves</p>
+                </div>
+
+                <div class="chart-element">
+                    <div class="chart-element-icon">🛑</div>
+                    <h4>Stop-Loss Label</h4>
+                    <p>Non-repaint, confirmed protection levels</p>
+                </div>
+
+                <div class="chart-element">
+                    <div class="chart-element-icon">✨</div>
+                    <h4>Minimal UI</h4>
+                    <p>Zero confusion, maximum clarity</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeframe Recommendations -->
+    <section id="timeframes">
+        <div class="container">
+            <h2 class="section-title">Recommended Timeframes</h2>
+            <p class="section-subtitle">Optimized settings for each market type</p>
+            
+            <div class="timeframes">
+                <div class="timeframe-chip">
+                    <strong>BANKNIFTY</strong>
+                    <span>5m / 15m</span>
+                </div>
+
+                <div class="timeframe-chip">
+                    <strong>NIFTY</strong>
+                    <span>5m / 15m</span>
+                </div>
+
+                <div class="timeframe-chip">
+                    <strong>STOCKS</strong>
+                    <span>10m / 15m</span>
+                </div>
+
+                <div class="timeframe-chip">
+                    <strong>BTCUSDT</strong>
+                    <span>1H / 4H</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" style="background: var(--dark);">
+        <div class="container">
+            <h2 class="section-title">Choose Your Plan</h2>
+            <p class="section-subtitle">Start with a free trial or go lifetime for maximum value</p>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>Free Trial</h3>
+                    <div class="price">₹0<span class="price-period"> / 30 days</span></div>
+                    <ul class="pricing-features">
+                        <li>Full indicator access</li>
+                        <li>All features unlocked</li>
+                        <li>Multi-target system</li>
+                        <li>Dynamic targets</li>
+                        <li>Email support</li>
+                        <li>30-day access</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary" style="width: 100%;">Start Free Trial</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <h3>Lifetime Access</h3>
+                    <div class="price">₹9,999<span class="price-period"> / one-time</span></div>
+                    <ul class="pricing-features">
+                        <li>Lifetime indicator access</li>
+                        <li>All features forever</li>
+                        <li>Free updates included</li>
+                        <li>Priority support</li>
+                        <li>WhatsApp community</li>
+                        <li>One-time payment</li>
+                        <li>Best value guarantee</li>
+                    </ul>
+                    <a href="#" class="btn btn-primary" style="width: 100%;">Buy Lifetime</a>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>Monthly Plan</h3>
+                    <div class="price">₹1,499<span class="price-period"> / month</span></div>
+                    <ul class="pricing-features">
+                        <li>Full indicator access</li>
+                        <li>All features unlocked</li>
+                        <li>Multi-target system</li>
+                        <li>Dynamic targets</li>
+                        <li>Email & chat support</li>
+                        <li>Cancel anytime</li>
+                    </ul>
+                    <a href="#" class="btn btn-secondary" style="width: 100%;">Buy Monthly</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Traders Are Saying</h2>
+            <p class="section-subtitle">Real feedback from real traders using FP PowerBeast</p>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Signals don't repaint. Targets hit beautifully. This is exactly what I needed for BankNIFTY scalping. Game changer!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RK</div>
+                        <div class="author-info">
+                            <h5>Rajesh Kumar <span class="verified-badge">✓ Verified</span></h5>
+                            <p>BankNIFTY Trader</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Perfect for options trading. The multi-target system helps me book profits systematically. No more guessing when to exit."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">PS</div>
+                        <div class="author-info">
+                            <h5>Priya Sharma <span class="verified-badge">✓ Verified</span></h5>
+                            <p>Options Trader</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Finally, an indicator that doesn't repaint! The stop-loss feature alone is worth the price. Highly recommended."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AM</div>
+                        <div class="author-info">
+                            <h5>Amit Mehta <span class="verified-badge">✓ Verified</span></h5>
+                            <p>Intraday Trader</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Using it for crypto swing trading. The dynamic targets caught massive moves in BTC. Absolutely brilliant!"</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SK</div>
+                        <div class="author-info">
+                            <h5>Sanjay Kapoor <span class="verified-badge">✓ Verified</span></h5>
+                            <p>Crypto Trader</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Clean interface, accurate signals, and the best part - it actually works! My win rate improved significantly."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">NP</div>
+                        <div class="author-info">
+                            <h5>Neha Patel <span class="verified-badge">✓ Verified</span></h5>
+                            <p>Stock Trader</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The 90% accuracy claim is real. I've been tracking my trades and it's consistently profitable. Worth every rupee."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">VG</div>
+                        <div class="author-info">
+                            <h5>Vikram Gupta <span class="verified-badge">✓ Verified</span></h5>
+                            <p>Professional Trader</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" style="background: var(--dark);">
+        <div class="container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-subtitle">Everything you need to know about FP PowerBeast</p>
+            
+            <div class="faq-container">
+                <div class="faq-item">
+                    <h4 class="faq-question">Does it repaint?</h4>
+                    <p class="faq-answer">Absolutely not. All entries, targets, and stop-loss levels are printed after the candle closes and never move. This is our core promise — 100% non-repaint guarantee.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4 class="faq-question">Does it work for options trading?</h4>
+                    <p class="faq-answer">Yes — it's perfect for BankNIFTY & NIFTY option buyers. The precise entry and exit signals help you time your option trades with accuracy.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4 class="faq-question">Which markets are supported?</h4>
+                    <p class="faq-answer">FP PowerBeast works across Index (NIFTY, BankNIFTY, Sensex), Stocks, Crypto (BTC, ETH, altcoins), and Options. One indicator for all your trading needs.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4 class="faq-question">How do I install the indicator?</h4>
+                    <p class="faq-answer">After purchase, you'll receive TradingView invite-only access to the indicator along with complete onboarding instructions and setup support.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4 class="faq-question">What timeframes work best?</h4>
+                    <p class="faq-answer">For BankNIFTY/NIFTY: 5m or 15m. For Stocks: 10m or 15m. For Crypto: 1H or 4H. The indicator adapts to your trading style.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4 class="faq-question">Is there a money-back guarantee?</h4>
+                    <p class="faq-answer">Yes! Try it risk-free with our 30-day free trial. If you're not satisfied with the monthly or lifetime plan, contact us within 7 days for a full refund.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4 class="faq-question">Do I need any prior trading experience?</h4>
+                    <p class="faq-answer">While the indicator is beginner-friendly with clear signals, basic understanding of trading concepts (entries, exits, stop-loss) is recommended for best results.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4 class="faq-question">Will I receive updates?</h4>
+                    <p class="faq-answer">Yes! All plans include free updates. We continuously improve the indicator based on market conditions and user feedback.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Support -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <p class="section-subtitle">We're here to help you succeed. Reach out anytime!</p>
+            
+            <div class="contact-buttons">
+                <a href="https://wa.me/" class="contact-btn" target="_blank">
+                    <span class="contact-icon">📱</span>
+                    <span>WhatsApp Support</span>
+                </a>
+
+                <a href="https://t.me/" class="contact-btn" target="_blank">
+                    <span class="contact-icon">✈️</span>
+                    <span>Telegram Channel</span>
+                </a>
+
+                <a href="mailto:support@fppowerbeast.com" class="contact-btn">
+                    <span class="contact-icon">📧</span>
+                    <span>Email Us</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms of Service</a>
+                <a href="#refund">Refund Policy</a>
+                <a href="#contact">Contact</a>
+            </div>
+            
+            <p class="footer-brand">
+                <strong>Powered by FP PowerBeast Engine</strong><br>
+                © 2025 FP PowerBeast Indicator. All rights reserved.<br>
+                <small>Trading involves risk. Past performance does not guarantee future results.</small>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Sticky CTA for Mobile -->
+    <div class="sticky-cta">
+        <a href="#pricing" class="btn">Get Started Now</a>
+    </div>
+</body>
+</html>
